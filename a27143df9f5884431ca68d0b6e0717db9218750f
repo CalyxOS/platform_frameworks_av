@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a93283a_919f3a55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2021-08-18T15:04:26Z",
+      "side": 1,
+      "message": "Replaced by https://android-review.googlesource.com/c/platform/frameworks/av/+/1791647 which is the same patch as the above, just authored by google...",
+      "revId": "a27143df9f5884431ca68d0b6e0717db9218750f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
