@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8186a696_61857f11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2022-04-06T19:08:27Z",
+      "side": 1,
+      "message": "Let\u0027s get this in to see if the random camera issues are resolved",
+      "revId": "35b4be72eb8d280d6f6b9ac5eefa1d9fa449945a",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
