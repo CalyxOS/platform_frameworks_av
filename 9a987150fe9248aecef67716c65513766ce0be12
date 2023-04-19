@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecab3cb6_5d89928a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-04-19T14:56:39Z",
+      "side": 1,
+      "message": "Test: Manual: Enable the Sensors Off quick settings tile via Developer Options. Turn on the tile. Open any Camera app. Should not show anything from any of the device\u0027s cameras.\n\n^ That test is based on my understanding of this patch. Assuming it\u0027s a correct one, this passes. Prior to the patch, Sensors Off does not affect the cameras.",
+      "revId": "9a987150fe9248aecef67716c65513766ce0be12",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
