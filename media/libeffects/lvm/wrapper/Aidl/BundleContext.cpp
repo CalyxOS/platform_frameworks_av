@@ -90,6 +90,23 @@ void BundleContext::deInit() {
     }
 }
 
+RetCode BundleContext::setCommon(const Parameter::Common& common) {
+    RetCode ret = EffectContext::setCommon(common);
+    RETURN_VALUE_IF(ret != RetCode::SUCCESS, ret, " setCommonFailed");
+    if (mInstance) {
+        LVM_ControlParams_t params;
+        RETURN_VALUE_IF(LVM_SUCCESS != LVM_GetControlParameters(mInstance, &params),
+                        RetCode::ERROR_EFFECT_LIB_ERROR, "failGetControlParams");
+        RETURN_VALUE_IF(RetCode::SUCCESS != applyCommonParameter(params),
+                        RetCode::ERROR_EFFECT_LIB_ERROR, " applyCommonParameterFailed");
+        RETURN_VALUE_IF(LVM_SUCCESS != LVM_SetControlParameters(mInstance, &params),
+                        RetCode::ERROR_EFFECT_LIB_ERROR, "failSetControlParams");
+    } else {
+        RETURN_VALUE_IF(RetCode::SUCCESS != init(), RetCode::ERROR_EFFECT_LIB_ERROR, " initFailed");
+    }
+    return RetCode::SUCCESS;
+}
+
 RetCode BundleContext::enable() {
     if (mEnabled) return RetCode::ERROR_ILLEGAL_PARAMETER;
     // Bass boost or Virtualizer can be temporarily disabled if playing over device speaker due to
@@ -599,7 +616,7 @@ RetCode BundleContext::setForcedDevice(
     return ret;
 }
 
-RetCode BundleContext::initControlParameter(LVM_ControlParams_t& params) const {
+RetCode BundleContext::applyCommonParameter(LVM_ControlParams_t& params) const {
     int outputChannelCount = ::aidl::android::hardware::audio::common::getChannelCount(
             mCommon.output.base.channelMask);
     auto outputChannelMaskConv = aidl2legacy_AudioChannelLayout_audio_channel_mask_t(
@@ -620,6 +637,13 @@ RetCode BundleContext::initControlParameter(LVM_ControlParams_t& params) const {
     } else if (inputChannelCount > 2 && inputChannelCount <= LVM_MAX_CHANNELS) {
         params.SourceFormat = LVM_MULTICHANNEL;
     }
+
+    return RetCode::SUCCESS;
+}
+
+RetCode BundleContext::initControlParameter(LVM_ControlParams_t& params) const {
+    RETURN_VALUE_IF(RetCode::SUCCESS != applyCommonParameter(params),
+                    RetCode::ERROR_EFFECT_LIB_ERROR, " applyCommonParameterFailed");
 
     /* General parameters */
     params.OperatingMode = LVM_MODE_ON;

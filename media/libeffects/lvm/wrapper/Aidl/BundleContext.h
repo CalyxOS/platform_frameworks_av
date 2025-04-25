@@ -35,6 +35,8 @@ class BundleContext final : public EffectContext {
     void deInit();
     lvm::BundleEffectType getBundleType() const { return mType; }
 
+    RetCode setCommon(const Parameter::Common& common) override;
+
     RetCode enable() override;
     RetCode enableOperatingMode();
     RetCode disable() override;
@@ -133,6 +135,7 @@ class BundleContext final : public EffectContext {
     bool isBandLevelIndexInRange(const std::vector<Equalizer::BandLevel>& bandLevels) const;
     static LVM_EQNB_BandDef_t* getDefaultEqualizerBandDefs();
     static LVM_HeadroomBandDef_t* getDefaultEqualizerHeadroomBanDefs();
+    RetCode applyCommonParameter(LVM_ControlParams_t& params) const;
 };
 
 }  // namespace aidl::android::hardware::audio::effect
