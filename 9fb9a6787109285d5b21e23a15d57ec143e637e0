@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59ca75ab_429ac1f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000034
+      },
+      "writtenOn": "2025-05-07T15:25:20Z",
+      "side": 1,
+      "message": "This should work, the paths covered allows it to properly count and later close dangling sessions.\nIt\u0027s probably over cautious but does the job.",
+      "revId": "9fb9a6787109285d5b21e23a15d57ec143e637e0",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}
