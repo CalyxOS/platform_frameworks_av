@@ -17,6 +17,7 @@
 package android.media;
 
 import android.media.audio.common.AudioConfigBase;
+import android.media.audio.common.AudioSource;
 
 /**
  * {@hide}
@@ -30,4 +31,6 @@ parcelable GetInputForAttrResponse {
     int portId;
     /** The suggested config if fails to get an input. **/
     AudioConfigBase config;
+    /** The audio source, possibly updated by audio policy manager */
+    AudioSource source;
 }

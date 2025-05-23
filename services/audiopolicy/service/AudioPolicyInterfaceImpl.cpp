@@ -872,6 +872,8 @@ Status AudioPolicyService::getInputForAttr(const media::audio::common::AudioAttr
             legacy2aidl_audio_port_handle_t_int32_t(selectedDeviceId));
     _aidl_return->portId = VALUE_OR_RETURN_BINDER_STATUS(
             legacy2aidl_audio_port_handle_t_int32_t(portId));
+    _aidl_return->source = VALUE_OR_RETURN_BINDER_STATUS(
+            legacy2aidl_audio_source_t_AudioSource(inputSource));
     return Status::ok();
 }
 
