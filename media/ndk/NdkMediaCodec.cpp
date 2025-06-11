@@ -168,7 +168,7 @@ void CodecHandler::onMessageReceived(const sp<AMessage> &msg) {
         {
              int32_t cbID;
              if (!msg->findInt32("callbackID", &cbID)) {
-                 ALOGE("kWhatAsyncNotify: callbackID is expected.");
+                 ALOGD("kWhatAsyncNotify: callbackID is expected.");
                  break;
              }
 
@@ -179,7 +179,7 @@ void CodecHandler::onMessageReceived(const sp<AMessage> &msg) {
                  {
                      int32_t index;
                      if (!msg->findInt32("index", &index)) {
-                         ALOGE("CB_INPUT_AVAILABLE: index is expected.");
+                         ALOGD("CB_INPUT_AVAILABLE: index is expected.");
                          break;
                      }
 
@@ -203,23 +203,23 @@ void CodecHandler::onMessageReceived(const sp<AMessage> &msg) {
                      int32_t flags;
 
                      if (!msg->findInt32("index", &index)) {
-                         ALOGE("CB_OUTPUT_AVAILABLE: index is expected.");
+                         ALOGD("CB_OUTPUT_AVAILABLE: index is expected.");
                          break;
                      }
                      if (!msg->findSize("offset", &offset)) {
-                         ALOGE("CB_OUTPUT_AVAILABLE: offset is expected.");
+                         ALOGD("CB_OUTPUT_AVAILABLE: offset is expected.");
                          break;
                      }
                      if (!msg->findSize("size", &size)) {
-                         ALOGE("CB_OUTPUT_AVAILABLE: size is expected.");
+                         ALOGD("CB_OUTPUT_AVAILABLE: size is expected.");
                          break;
                      }
                      if (!msg->findInt64("timeUs", &timeUs)) {
-                         ALOGE("CB_OUTPUT_AVAILABLE: timeUs is expected.");
+                         ALOGD("CB_OUTPUT_AVAILABLE: timeUs is expected.");
                          break;
                      }
                      if (!msg->findInt32("flags", &flags)) {
-                         ALOGE("CB_OUTPUT_AVAILABLE: flags is expected.");
+                         ALOGD("CB_OUTPUT_AVAILABLE: flags is expected.");
                          break;
                      }
 
@@ -245,7 +245,7 @@ void CodecHandler::onMessageReceived(const sp<AMessage> &msg) {
                  {
                      sp<AMessage> format;
                      if (!msg->findMessage("format", &format)) {
-                         ALOGE("CB_OUTPUT_FORMAT_CHANGED: format is expected.");
+                         ALOGD("CB_OUTPUT_FORMAT_CHANGED: format is expected.");
                          break;
                      }
 
@@ -274,15 +274,15 @@ void CodecHandler::onMessageReceived(const sp<AMessage> &msg) {
                      int32_t actionCode;
                      AString detail;
                      if (!msg->findInt32("err", &err)) {
-                         ALOGE("CB_ERROR: err is expected.");
+                         ALOGD("CB_ERROR: err is expected.");
                          break;
                      }
                      if (!msg->findInt32("actionCode", &actionCode)) {
-                         ALOGE("CB_ERROR: actionCode is expected.");
+                         ALOGD("CB_ERROR: actionCode is expected.");
                          break;
                      }
                      msg->findString("detail", &detail);
-                     ALOGE("Codec reported error(0x%x/%s), actionCode(%d), detail(%s)",
+                     ALOGI("Codec reported error(0x%x/%s), actionCode(%d), detail(%s)",
                            err, StrMediaError(err).c_str(), actionCode, detail.c_str());
 
                      Mutex::Autolock _l(mCodec->mAsyncCallbackLock);
@@ -298,9 +298,52 @@ void CodecHandler::onMessageReceived(const sp<AMessage> &msg) {
                      break;
                  }
 
+                 case MediaCodec::CB_CRYPTO_ERROR:
+                 {
+                     status_t err;
+                     int32_t actionCode;
+                     AString detail;
+                     if (!msg->findInt32("err", &err)) {
+                         ALOGD("CB_ERROR: err is expected.");
+                         break;
+                     }
+                     if (!msg->findInt32("actionCode", &actionCode)) {
+                         ALOGD("CB_ERROR: actionCode is expected.");
+                         break;
+                     }
+                     msg->findString("errorDetail", &detail);
+                     ALOGI("Codec reported crypto error(0x%x/%s), actionCode(%d), detail(%s)"
+                           " that cannot be passed to the NDK client",
+                           err, StrMediaError(err).c_str(), actionCode, detail.c_str());
+                     // TODO: handle crypto error. We could in theory pass this via the regular
+                     // onAsyncError callback, but clients are not expecting it, and would make
+                     // it harder to distinguish between crypto and non-crypto errors in the
+                     // future.
+                     break;
+                 }
+
+                 case MediaCodec::CB_REQUIRED_RESOURCES_CHANGED:
+                 {
+                     ALOGV("kWhatAsyncNotify: ignoring CB_REQUIRED_RESOURCES_CHANGED event.");
+                     break;
+                 }
+
+                 case MediaCodec::CB_METRICS_FLUSHED:
+                 {
+                     ALOGV("kWhatAsyncNotify: ignoring CB_METRICS_FLUSHED event.");
+                     break;
+                 }
+
+                 case MediaCodec::CB_LARGE_FRAME_OUTPUT_AVAILABLE:
+                 {
+                     ALOGD("kWhatAsyncNotify: ignoring CB_LARGE_FRAME_OUTPUT_AVAILABLE event.");
+                     // TODO: handle large frame output in NDK API.
+                     break;
+                 }
+
                  default:
                  {
-                     ALOGE("kWhatAsyncNotify: callbackID(%d) is unexpected.", cbID);
+                     ALOGD("kWhatAsyncNotify: callbackID(%d) is unexpected.", cbID);
                      break;
                  }
              }
@@ -390,7 +433,7 @@ void CodecHandler::onMessageReceived(const sp<AMessage> &msg) {
         }
 
         default:
-            ALOGE("shouldn't be here");
+            ALOGD("unexpected message received: %d. shouldn't be here", msg->what());
             break;
     }
 
@@ -835,7 +878,12 @@ media_status_t AMediaCodec_createInputSurface(AMediaCodec *mData, ANativeWindow 
         return translate_error(err);
     }
 
-    *surface = new Surface(igbp);
+    // This will increment default strongCount on construction.  It will be decremented
+    // on function exit.
+    auto spSurface = sp<Surface>::make(igbp);
+    *surface = spSurface.get();
+    // This will increment a private strongCount.  It will be decremented in
+    // ANativeWindow_release.
     ANativeWindow_acquire(*surface);
     return AMEDIA_OK;
 }
